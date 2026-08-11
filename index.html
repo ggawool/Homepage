@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ▼ 브라우저 탭에 표시되는 사이트 제목입니다. 원하는 문구로 바꾸세요 -->
+<title>PREUS GAMES.</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* =====================================================
+     색상 / 폰트 설정값 (전체 사이트 톤을 여기서 한번에 바꿀 수 있어요)
+     ===================================================== */
+  :root{
+    --bg: #12141c;          /* 전체 배경색 */
+    --bg-deep: #0b0c12;     /* 조금 더 어두운 배경 (게임/문의 섹션) */
+    --surface: #1c1f2b;     /* 카드/박스 배경색 */
+    --surface-hi: #262a3a;  /* 카드 hover 시 배경색 */
+    --line: #33384a;        /* 테두리 선 색 */
+    --amber: #ffb020;       /* 포인트 컬러 1 (버튼, 강조) */
+    --amber-dim: #7a5a1c;
+    --cyan: #4fd1c5;        /* 포인트 컬러 2 (링크, 보조 강조) */
+    --text: #f5f3ea;        /* 기본 글자색 */
+    --text-muted: #9096ac;  /* 흐린 설명 글자색 */
+    --font-display: 'Press Start 2P', monospace;
+    --font-body: 'Space Grotesk', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* CRT 스캔라인 분위기 효과 (지워도 레이아웃엔 영향 없음) */
+  body::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.025) 0px,
+      rgba(255,255,255,0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    mix-blend-mode: overlay;
+  }
+
+  section{ scroll-margin-top: 76px; } /* 상단 고정메뉴에 가려지지 않도록 여백 확보 */
+
+  a{ color: inherit; text-decoration: none; }
+  ul{ list-style: none; }
+  img{ max-width: 100%; display:block; }
+
+  ::selection{ background: var(--amber); color: var(--bg-deep); }
+
+  /* ---------- 상단 고정 네비게이션 ---------- */
+  header{
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(18,20,28,0.88);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner{
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo{
+    font-family: var(--font-display);
+    font-size: 13px;
+    color: var(--amber);
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo::before{
+    content: "▮▮";
+    color: var(--cyan);
+    font-size: 10px;
+    animation: blink 1.4s steps(1) infinite;
+  }
+  @keyframes blink{ 50%{ opacity: 0.15; } }
+
+  nav ul{
+    display: flex;
+    gap: 8px;
+  }
+  nav a{
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    padding: 8px 14px;
+    border-radius: 4px;
+    transition: color .2s ease, background .2s ease;
+    position: relative;
+  }
+  nav a:hover{ color: var(--text); background: var(--surface-hi); }
+  nav a.active{ color: var(--amber); }
+  nav a.active::after{
+    content: "";
+    position: absolute;
+    left: 14px; right: 14px; bottom: 2px;
+    height: 2px;
+    background: var(--amber);
+  }
+
+  .nav-toggle{
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .nav-toggle span{
+    width: 22px; height: 2px;
+    background: var(--text);
+  }
+
+  /* ---------- 히어로(첫 화면) ---------- */
+  /*
+    ================================================================
+    첫 화면 배경 이미지 설정
+    ================================================================
+    아래 background 속성 맨 마지막 줄의 url('images/hero-bg.jpg') 부분을
+    실제 이미지 경로로 바꾸면 배경이 화면 전체에 꽉 차게 채워집니다.
+
+    ▷ 이미지 파일 위치 : index.html과 같은 폴더에 images 폴더를 만들고
+       그 안에 넣은 뒤, 파일명만 맞춰서 경로를 적어주면 됩니다.
+       예) images/hero-bg.jpg, images/hero-bg.png
+
+    ▷ 권장 사이즈  : 1920 x 1080px (16:9), 가로 1920px 이상 권장
+                     (레티나/고해상도 모니터까지 선명하게 보이려면 2560 x 1440px)
+    ▷ 최소 사이즈  : 1600 x 900px (이보다 작으면 화면이 넓을 때 화질이 흐려질 수 있음)
+    ▷ 파일 형식    : jpg 또는 webp 권장 (webp가 같은 화질에 용량이 더 작음)
+    ▷ 파일 용량    : 로딩 속도를 위해 가능하면 500KB 이하로 압축 권장
+                     (squoosh.app, tinypng.com 같은 무료 압축 사이트 활용 가능)
+    ▷ 이미지 톤    : 어두운 톤이거나, 아래 검정색 그라데이션 오버레이와
+                     자연스럽게 어울리는 이미지를 사용하면 글자 가독성이 좋아집니다.
+
+    background는 여러 겹을 쌓는 방식이며, 아래 순서대로 적용됩니다.
+      1) 위쪽/아래쪽을 어둡게 눌러주는 그라데이션 (텍스트 가독성용, 필요시 투명도 rgba 숫자 조절)
+      2) 기존 포인트 컬러 광원 효과 (지워도 무방)
+      3) 실제 배경 이미지 (맨 아래 깔리는 레이어)
+    ================================================================
+  */
+  #home{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 140px 24px 80px;
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(11,12,18,0.82) 0%, rgba(11,12,18,0.55) 45%, rgba(11,12,18,0.88) 100%),
+      radial-gradient(ellipse at 50% 20%, rgba(255,176,32,0.08), transparent 55%),
+      radial-gradient(ellipse at 80% 80%, rgba(79,209,197,0.06), transparent 50%),
+      url('images/hero-bg.jpg');  /* ◀ 여기에 배경 이미지 경로를 넣으세요 */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .eyebrow{
+    font-family: var(--font-mono);
+    color: var(--cyan);
+    font-size: 13px;
+    letter-spacing: 3px;
+    margin-bottom: 24px;
+  }
+  .eyebrow::before{ content: "> "; }
+  h1.hero-title{
+    font-family: var(--font-display);
+    font-size: clamp(28px, 6vw, 56px);
+    line-height: 1.5;
+    color: var(--text);
+    text-shadow: 3px 3px 0 var(--amber-dim);
+    max-width: 900px;
+  }
+  .hero-sub{
+    margin-top: 28px;
+    max-width: 560px;
+    color: var(--text-muted);
+    font-size: 16px;
+  }
+  .hero-actions{
+    margin-top: 40px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn{
+    font-family: var(--font-mono);
+    font-size: 14px;
+    padding: 14px 28px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    display: inline-block;
+  }
+  .btn-primary{
+    background: var(--amber);
+    color: var(--bg-deep);
+    font-weight: 600;
+    border-color: var(--amber);
+  }
+  .btn-primary:hover{ transform: translateY(-2px); }
+  .btn-ghost{ color: var(--text); }
+  .btn-ghost:hover{ border-color: var(--cyan); color: var(--cyan); }
+
+  .scroll-cue{
+    position: absolute;
+    bottom: 36px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    animation: bob 2s ease-in-out infinite;
+  }
+  @keyframes bob{ 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(6px);} }
+
+  /* ---------- 섹션 공통 스타일 ---------- */
+  .section-inner{
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 100px 24px;
+  }
+  .section-head{
+    margin-bottom: 56px;
+  }
+  .section-tag{
+    font-family: var(--font-mono);
+    color: var(--amber);
+    font-size: 13px;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+  .section-title{
+    font-family: var(--font-display);
+    font-size: clamp(20px, 3vw, 30px);
+    line-height: 1.6;
+  }
+  .section-desc{
+    margin-top: 16px;
+    color: var(--text-muted);
+    max-width: 560px;
+  }
+
+  #games{ background: var(--bg-deep); }
+
+  /* ---------- 게임 소개 카드: 3열 그리드 (한 줄에 3개씩, 넘치면 아래 줄로) ---------- */
+  .game-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .game-card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color .2s ease, transform .2s ease;
+  }
+  .game-card:hover{ border-color: var(--amber); transform: translateY(-4px); }
+
+  .game-thumb{
+    height: 160px;
+    background:
+      repeating-linear-gradient(45deg, var(--surface-hi) 0 10px, var(--surface) 10px 20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 11px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+  /* 유튜브 영상 소개용 썸네일 (iframe이 꽉 차도록) */
+  .game-thumb.video-thumb{ padding: 0; }
+  .game-thumb.video-thumb iframe{
+    width: 100%; height: 100%; border: none;
+  }
+  .game-thumb img{ width: 100%; height: 100%; object-fit: cover; }
+
+  .game-body{ padding: 24px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+  .game-title-row{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .game-title{ font-size: 19px; font-weight: 700; }
+  .game-ver{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--cyan);
+    white-space: nowrap;
+  }
+  /* 설명글은 항상 2줄까지만 보이고 그 이상은 자동으로 잘려요(...) */
+  .game-desc{
+    color: var(--text-muted);
+    font-size: 14px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.6em;
+  }
+  .tag-row{ display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    border: 1px solid var(--line);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .game-actions{ margin-top: auto; padding-top: 8px; }
+  .play-btn{
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--amber);
+    border: 1px solid var(--amber-dim);
+    padding: 10px 18px;
+    border-radius: 4px;
+    transition: background .15s ease, color .15s ease;
+  }
+  .play-btn:hover{ background: var(--amber); color: var(--bg-deep); }
+
+  /* ---------- 뉴스 ---------- */
+  .news-list{ display: flex; flex-direction: column; }
+  .news-item{
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .news-item:first-child{ border-top: 1px solid var(--line); }
+  .news-date{
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--cyan);
+  }
+  .news-title{ font-weight: 600; margin-bottom: 6px; }
+  .news-desc{ color: var(--text-muted); font-size: 14px; }
+
+  /* ---------- 히스토리 (타임라인) ---------- */
+  .timeline{
+    position: relative;
+    padding-left: 32px;
+  }
+  .timeline::before{
+    content: "";
+    position: absolute;
+    left: 5px; top: 6px; bottom: 6px;
+    width: 2px;
+    background: var(--line);
+  }
+  .tl-item{
+    position: relative;
+    padding-bottom: 40px;
+  }
+  .tl-item:last-child{ padding-bottom: 0; }
+  .tl-item::before{
+    content: "";
+    position: absolute;
+    left: -32px; top: 4px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--amber);
+  }
+  .tl-ver{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--amber);
+    margin-bottom: 6px;
+  }
+  .tl-title{ font-weight: 700; margin-bottom: 6px; }
+  .tl-desc{ color: var(--text-muted); font-size: 14px; }
+
+  /* ---------- 개발 중인 게임 소개 ---------- */
+  #indev{ background: var(--bg-deep); }
+  .devgame-box{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 48px;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 40px;
+  }
+
+  /* 왼쪽: 유튜브 영상 + 스크린샷 갤러리 */
+  .devgame-media{ display: flex; flex-direction: column; gap: 16px; }
+
+  /* 유튜브 영상 자리 (16:9 비율 자동 유지, 반응형) */
+  .devgame-video{
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 비율 */
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--bg);
+  }
+  .devgame-video iframe{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* 스크린샷 3장 그리드 */
+  .devgame-shots{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .devgame-shot{
+    aspect-ratio: 16 / 9;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    overflow: hidden;
+    background: repeating-linear-gradient(45deg, var(--surface-hi) 0 10px, var(--surface) 10px 20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+  .devgame-shot img{ width: 100%; height: 100%; object-fit: cover; }
+
+  /* 오른쪽: 소개 문구 영역 */
+  .devgame-info{ display: flex; flex-direction: column; gap: 16px; }
+  .devgame-status{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--cyan);
+    letter-spacing: 1.5px;
+  }
+  .devgame-title{
+    font-family: var(--font-display);
+    font-size: clamp(18px, 2.2vw, 24px);
+    line-height: 1.7;
+  }
+  .devgame-title-note{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+  .devgame-tagline{ color: var(--text); font-size: 15px; font-weight: 600; }
+  .devgame-desc{ color: var(--text-muted); font-size: 14px; line-height: 1.8; }
+
+  footer{
+    text-align: center;
+    padding: 32px 24px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* ---------- 반응형 (모바일 화면) ---------- */
+  /* 태블릿 화면: 3열 → 2열 */
+  @media (max-width: 960px){
+    .game-grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 780px){
+    nav ul{
+      position: fixed;
+      top: 60px; right: 0; left: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+      flex-direction: column;
+      padding: 12px;
+      gap: 4px;
+      transform: translateY(-150%);
+      transition: transform .25s ease;
+    }
+    nav ul.open{ transform: translateY(0); }
+    .nav-toggle{ display: flex; }
+    .devgame-box{ grid-template-columns: 1fr; padding: 32px 24px; }
+    .devgame-shots{ grid-template-columns: repeat(3, 1fr); }
+    .news-item{ grid-template-columns: 1fr; gap: 6px; }
+    .game-grid{ grid-template-columns: 1fr; } /* 모바일: 1열 */
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-inner">
+    <!-- ▼ 사이트 로고(이름) 텍스트 -->
+    <a href="#home" class="logo">PREUS GAMES.</a>
+
+    <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기">
+      <span></span><span></span><span></span>
+    </button>
+
+    <!-- ▼ 상단 메뉴 목록 (섹션을 추가/삭제하면 아래 항목도 함께 맞춰주세요.
+         href="#아이디" 값은 아래 <section id="아이디">와 반드시 일치해야 이동이 됩니다) -->
+    <nav>
+      <ul id="navList">
+        <li><a href="#games">GAMES</a></li>
+        <li><a href="#news">NEWS</a></li>
+        <li><a href="#history">HISTORY</a></li>
+        <li><a href="#indev">IN DEV</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ 첫 화면(히어로) ============ -->
+<!-- ▼ 배경 이미지는 여기서 넣는 게 아니라 위쪽 <style> 안의 "#home{ ... }" 부분에서
+     background: 마지막 줄 url('images/hero-bg.jpg') 경로를 바꾸면 적용됩니다.
+     (권장 1920x1080 이상 / 최소 1600x900, 자세한 안내는 해당 CSS 위 주석 참고) -->
+<section id="home">
+  <!-- ▼ 상단 작은 문구 -->
+  <p class="eyebrow">BROWSER GAME DEV LOG</p>
+
+  <!-- ▼ 메인 제목 (줄바꿈이 필요한 곳에 <br> 사용) -->
+  <h1 class="hero-title">브라우저에서 즐기는<br>작지만 완성도 있는 게임들</h1>
+
+  <!-- ▼ 부제목 설명 -->
+  <p class="hero-sub">혼자, 혹은 친구와 함께. 설치 없이 링크 하나로 바로 즐기는 웹 게임을 만듭니다.</p>
+
+  <!-- ▼ 버튼 2개 (텍스트와 href="#아이디" 를 바꿀 수 있어요) -->
+  <div class="hero-actions">
+    <a href="#games" class="btn btn-primary">게임 보러가기</a>
+    <a href="#history" class="btn btn-ghost">개발 히스토리</a>
+  </div>
+  <div class="scroll-cue">SCROLL ▾</div>
+</section>
+
+<!-- ============ 게임 소개 (3열 그리드) ============ -->
+<section id="games">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="section-tag">01 · GAMES</p>
+      <!-- ▼ 섹션 제목/설명 -->
+      <h2 class="section-title">지금 플레이할 수 있는 게임</h2>
+      <p class="section-desc">직접 만든 HTML 기반 브라우저 게임입니다. 로그인 없이 바로 시작하세요.</p>
+    </div>
+
+    <!--
+      ================================================================
+      게임 카드 작성 가이드 (카드 하나의 구조)
+      ================================================================
+      1) 썸네일(.game-thumb) : 두 가지 방식 중 선택
+         - 이미지로 소개할 경우 :
+           <div class="game-thumb"><img src="이미지경로.jpg" alt="게임 이름"></div>
+         - 유튜브 영상으로 소개할 경우 :
+           <div class="game-thumb video-thumb">
+             <iframe src="https://www.youtube.com/embed/영상ID" title="게임 소개 영상" allowfullscreen></iframe>
+           </div>
+      2) .game-title  : 게임 이름
+      3) .game-ver    : 버전 표시 (없으면 이 줄 자체를 지워도 됨)
+      4) .game-desc   : 게임 설명. 2줄까지만 화면에 보이고 넘치면 자동으로 "..." 처리됩니다
+      5) .tag         : 게임 특징 태그. <span class="tag">태그명</span> 을 추가/삭제해서 개수 조절
+      6) .play-btn    : "PLAY" 버튼의 href="" 안에 실제 게임 파일 주소를 넣으세요
+      카드를 더 추가하려면 <div class="game-card">...</div> 통째로 복사해서
+      .game-grid 안에 붙여넣으면 됩니다. 한 줄에 3개씩 채워지고,
+      개수가 많아지면 자동으로 다음 줄로 넘어갑니다.
+      (화면이 좁아지면 태블릿은 2열, 모바일은 1열로 자동 조정됩니다)
+      ================================================================
+    -->
+    <div class="game-grid">
+
+        <!-- 게임 카드 1 -->
+        <div class="game-card">
+          <div class="game-thumb">MAZE // GENERATED</div>
+          <div class="game-body">
+            <div class="game-title-row">
+              <span class="game-title">미로 탈출</span>
+              <span class="game-ver">v1.6</span>
+            </div>
+            <p class="game-desc">매번 새롭게 생성되는 절차적 미로 게임입니다. 혼자서, 혹은 친구와 턴을 나눠가며 탈출구를 찾아보세요.</p>
+            <div class="tag-row">
+              <span class="tag">싱글/듀오 모드</span>
+              <span class="tag">턴제</span>
+              <span class="tag">아이템 수집</span>
+            </div>
+            <div class="game-actions">
+              <a href="#" class="play-btn">PLAY ▸</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게임 카드 2 -->
+        <div class="game-card">
+          <div class="game-thumb">STACKBURGER // 2P</div>
+          <div class="game-body">
+            <div class="game-title-row">
+              <span class="game-title">스택버거</span>
+              <span class="game-ver">v1.0</span>
+            </div>
+            <p class="game-desc">레시피를 기억하고 재료를 순서대로 쌓는 2인 경쟁 메모리 게임. 더 빠르고 정확한 쪽이 승리합니다.</p>
+            <div class="tag-row">
+              <span class="tag">2인 경쟁</span>
+              <span class="tag">메모리 카드</span>
+            </div>
+            <div class="game-actions">
+              <a href="#" class="play-btn">PLAY ▸</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게임 카드 3 -->
+        <div class="game-card">
+          <div class="game-thumb">MAZE // GENERATED</div>
+          <div class="game-body">
+            <div class="game-title-row">
+              <span class="game-title">미로 탈출</span>
+              <span class="game-ver">v1.6</span>
+            </div>
+            <p class="game-desc">매번 새롭게 생성되는 절차적 미로 게임입니다. 혼자서, 혹은 친구와 턴을 나눠가며 탈출구를 찾아보세요.</p>
+            <div class="tag-row">
+              <span class="tag">싱글/듀오 모드</span>
+              <span class="tag">턴제</span>
+              <span class="tag">아이템 수집</span>
+            </div>
+            <div class="game-actions">
+              <a href="#" class="play-btn">PLAY ▸</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게임 카드 4 -->
+        <div class="game-card">
+          <div class="game-thumb">STACKBURGER // 2P</div>
+          <div class="game-body">
+            <div class="game-title-row">
+              <span class="game-title">스택버거</span>
+              <span class="game-ver">v1.0</span>
+            </div>
+            <p class="game-desc">레시피를 기억하고 재료를 순서대로 쌓는 2인 경쟁 메모리 게임. 더 빠르고 정확한 쪽이 승리합니다.</p>
+            <div class="tag-row">
+              <span class="tag">2인 경쟁</span>
+              <span class="tag">메모리 카드</span>
+            </div>
+            <div class="game-actions">
+              <a href="#" class="play-btn">PLAY ▸</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게임 카드 5 -->
+        <div class="game-card">
+          <div class="game-thumb">MAZE // GENERATED</div>
+          <div class="game-body">
+            <div class="game-title-row">
+              <span class="game-title">미로 탈출</span>
+              <span class="game-ver">v1.6</span>
+            </div>
+            <p class="game-desc">매번 새롭게 생성되는 절차적 미로 게임입니다. 혼자서, 혹은 친구와 턴을 나눠가며 탈출구를 찾아보세요.</p>
+            <div class="tag-row">
+              <span class="tag">싱글/듀오 모드</span>
+              <span class="tag">턴제</span>
+              <span class="tag">아이템 수집</span>
+            </div>
+            <div class="game-actions">
+              <a href="#" class="play-btn">PLAY ▸</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게임 카드 6 -->
+        <div class="game-card">
+          <div class="game-thumb">STACKBURGER // 2P</div>
+          <div class="game-body">
+            <div class="game-title-row">
+              <span class="game-title">스택버거</span>
+              <span class="game-ver">v1.0</span>
+            </div>
+            <p class="game-desc">레시피를 기억하고 재료를 순서대로 쌓는 2인 경쟁 메모리 게임. 더 빠르고 정확한 쪽이 승리합니다.</p>
+            <div class="tag-row">
+              <span class="tag">2인 경쟁</span>
+              <span class="tag">메모리 카드</span>
+            </div>
+            <div class="game-actions">
+              <a href="#" class="play-btn">PLAY ▸</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게임 카드 7 -->
+        <div class="game-card">
+          <div class="game-thumb">MAZE // GENERATED</div>
+          <div class="game-body">
+            <div class="game-title-row">
+              <span class="game-title">미로 탈출</span>
+              <span class="game-ver">v1.6</span>
+            </div>
+            <p class="game-desc">매번 새롭게 생성되는 절차적 미로 게임입니다. 혼자서, 혹은 친구와 턴을 나눠가며 탈출구를 찾아보세요.</p>
+            <div class="tag-row">
+              <span class="tag">싱글/듀오 모드</span>
+              <span class="tag">턴제</span>
+              <span class="tag">아이템 수집</span>
+            </div>
+            <div class="game-actions">
+              <a href="#" class="play-btn">PLAY ▸</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게임 카드 8 -->
+        <div class="game-card">
+          <div class="game-thumb">STACKBURGER // 2P</div>
+          <div class="game-body">
+            <div class="game-title-row">
+              <span class="game-title">스택버거</span>
+              <span class="game-ver">v1.0</span>
+            </div>
+            <p class="game-desc">레시피를 기억하고 재료를 순서대로 쌓는 2인 경쟁 메모리 게임. 더 빠르고 정확한 쪽이 승리합니다.</p>
+            <div class="tag-row">
+              <span class="tag">2인 경쟁</span>
+              <span class="tag">메모리 카드</span>
+            </div>
+            <div class="game-actions">
+              <a href="#" class="play-btn">PLAY ▸</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게임 카드 9 -->
+        <div class="game-card">
+          <div class="game-thumb">MAZE // GENERATED</div>
+          <div class="game-body">
+            <div class="game-title-row">
+              <span class="game-title">미로 탈출</span>
+              <span class="game-ver">v1.6</span>
+            </div>
+            <p class="game-desc">매번 새롭게 생성되는 절차적 미로 게임입니다. 혼자서, 혹은 친구와 턴을 나눠가며 탈출구를 찾아보세요.</p>
+            <div class="tag-row">
+              <span class="tag">싱글/듀오 모드</span>
+              <span class="tag">턴제</span>
+              <span class="tag">아이템 수집</span>
+            </div>
+            <div class="game-actions">
+              <a href="#" class="play-btn">PLAY ▸</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게임 카드 10 -->
+        <div class="game-card">
+          <div class="game-thumb">STACKBURGER // 2P</div>
+          <div class="game-body">
+            <div class="game-title-row">
+              <span class="game-title">스택버거</span>
+              <span class="game-ver">v1.0</span>
+            </div>
+            <p class="game-desc">레시피를 기억하고 재료를 순서대로 쌓는 2인 경쟁 메모리 게임. 더 빠르고 정확한 쪽이 승리합니다.</p>
+            <div class="tag-row">
+              <span class="tag">2인 경쟁</span>
+              <span class="tag">메모리 카드</span>
+            </div>
+            <div class="game-actions">
+              <a href="#" class="play-btn">PLAY ▸</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게임 카드 11 -->
+        <div class="game-card">
+          <div class="game-thumb">MAZE // GENERATED</div>
+          <div class="game-body">
+            <div class="game-title-row">
+              <span class="game-title">미로 탈출</span>
+              <span class="game-ver">v1.6</span>
+            </div>
+            <p class="game-desc">매번 새롭게 생성되는 절차적 미로 게임입니다. 혼자서, 혹은 친구와 턴을 나눠가며 탈출구를 찾아보세요.</p>
+            <div class="tag-row">
+              <span class="tag">싱글/듀오 모드</span>
+              <span class="tag">턴제</span>
+              <span class="tag">아이템 수집</span>
+            </div>
+            <div class="game-actions">
+              <a href="#" class="play-btn">PLAY ▸</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게임 카드 12 -->
+        <div class="game-card">
+          <div class="game-thumb">STACKBURGER // 2P</div>
+          <div class="game-body">
+            <div class="game-title-row">
+              <span class="game-title">스택버거</span>
+              <span class="game-ver">v1.0</span>
+            </div>
+            <p class="game-desc">레시피를 기억하고 재료를 순서대로 쌓는 2인 경쟁 메모리 게임. 더 빠르고 정확한 쪽이 승리합니다.</p>
+            <div class="tag-row">
+              <span class="tag">2인 경쟁</span>
+              <span class="tag">메모리 카드</span>
+            </div>
+            <div class="game-actions">
+              <a href="#" class="play-btn">PLAY ▸</a>
+            </div>
+          </div>
+        </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ 뉴스 ============ -->
+<section id="news">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="section-tag">02 · NEWS</p>
+      <h2 class="section-title">업데이트 소식</h2>
+      <p class="section-desc">새로운 기능과 수정 사항을 이곳에 기록합니다.</p>
+    </div>
+
+    <!-- ▼ 뉴스 항목 하나 = .news-item 한 덩어리. 복사해서 추가/삭제하면 됩니다 -->
+    <div class="news-list">
+      <div class="news-item">
+        <span class="news-date">2026.07</span> <!-- 날짜 -->
+        <div>
+          <p class="news-title">미로 탈출 v1.6 공개</p> <!-- 제목 -->
+          <p class="news-desc">아이템 수집 효과음과 점수 시스템, 최고 기록 저장 기능이 추가되었습니다.</p> <!-- 내용 -->
+        </div>
+      </div>
+      <div class="news-item">
+        <span class="news-date">2026.05</span>
+        <div>
+          <p class="news-title">스택버거 2인 대전 모드 정식 출시</p>
+          <p class="news-desc">턴 표시 UI를 개선하고 재료 스택 애니메이션을 추가했습니다.</p>
+        </div>
+      </div>
+      <div class="news-item">
+        <span class="news-date">2026.03</span>
+        <div>
+          <p class="news-title">PREUS GAMES 사이트 오픈</p>
+          <p class="news-desc">그동안 만든 브라우저 게임들을 한곳에 모아 소개합니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 히스토리 (타임라인) ============ -->
+<section id="history">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="section-tag">03 · HISTORY</p>
+      <h2 class="section-title">개발 히스토리</h2>
+      <p class="section-desc">첫 게임부터 지금까지의 흐름입니다.</p>
+    </div>
+
+    <!-- ▼ 타임라인 항목 하나 = .tl-item 한 덩어리. 복사해서 추가/삭제하면 됩니다 -->
+    <div class="timeline">
+      <div class="tl-item">
+        <p class="tl-ver">MAZE v1.6</p>          <!-- 버전/구분 표시 -->
+        <p class="tl-title">사운드 & 스코어 시스템 완성</p>  <!-- 제목 -->
+        <p class="tl-desc">아이템 효과음, 점수판, 로컬 최고 기록 저장까지 더해져 완성도를 높였습니다.</p> <!-- 설명 -->
+      </div>
+      <div class="tl-item">
+        <p class="tl-ver">MAZE v1.0</p>
+        <p class="tl-title">절차적 미로 생성 & 턴제 모드 구현</p>
+        <p class="tl-desc">매판 새로운 미로가 생성되며, 싱글/듀오 턴제 플레이를 지원합니다.</p>
+      </div>
+      <div class="tl-item">
+        <p class="tl-ver">STACKBURGER</p>
+        <p class="tl-title">2인 경쟁 메모리 게임 제작</p>
+        <p class="tl-desc">재료 쌓기 레시피를 시각화하고, 명확한 턴 표시 UI를 적용했습니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 개발 중인 게임 소개 ============ -->
+<section id="indev">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="section-tag">04 · IN DEV</p>
+      <!-- ▼ 섹션 제목/설명 -->
+      <h2 class="section-title">지금 개발 중인 게임</h2>
+      <p class="section-desc">다음 프로젝트를 미리 만나보세요. 아직 다듬어지는 중입니다.</p>
+    </div>
+
+    <!--
+      ================================================================
+      개발중인 게임 소개 카드 작성 가이드
+      ================================================================
+      1) 유튜브 영상 (.devgame-video)
+         - iframe의 src="" 안에 유튜브 임베드 주소를 넣으세요
+           예) https://www.youtube.com/embed/영상ID
+         - 크기는 자동으로 16:9 비율에 맞춰 반응형으로 조절됩니다.
+           (유튜브 업로드 시 1920x1080 해상도 권장)
+
+      2) 개발 스크린샷 (.devgame-shot 3개)
+         - 각 박스 안의 텍스트(예: SCREENSHOT 1)를 지우고
+           <img src="이미지경로.jpg" alt="스크린샷 설명"> 을 넣으면 사진으로 교체됩니다.
+         - 권장 사이즈 : 1280 x 720px (16:9)
+         - 최소 사이즈 : 800 x 450px
+         - 형식 : jpg, png, webp
+         - 스크린샷을 더 추가하려면 .devgame-shot 한 덩어리를 복사해서
+           .devgame-shots 안에 붙여넣고, CSS의 grid-template-columns 숫자를
+           원하는 열 개수로 바꿔주세요.
+
+      3) 소개 문구 (.devgame-info)
+         - .devgame-status  : 개발 단계 표시 문구 (예: PROTOTYPE, EARLY DEV, ALPHA 등)
+         - .devgame-title   : 게임 제목(가제). 아직 정식 이름이 아니라면 "(가제)"를 함께 표기
+         - .devgame-tagline : 한 줄 소개 문구 (게임을 한마디로 표현)
+         - .devgame-desc    : 게임 소개 설명 (자유롭게 여러 문장 작성 가능)
+         - .tag             : 게임 특징 태그. <span class="tag">태그명</span> 추가/삭제로 개수 조절
+      ================================================================
+    -->
+    <div class="devgame-box">
+
+      <div class="devgame-media">
+        <!-- ▼ 유튜브 개발 영상 -->
+        <div class="devgame-video">
+          <iframe src="https://www.youtube.com/embed/영상ID를넣으세요" title="개발중인 게임 영상" allowfullscreen></iframe>
+        </div>
+
+        <!-- ▼ 개발 스크린샷 3장 -->
+        <div class="devgame-shots">
+          <div class="devgame-shot">SCREENSHOT 1</div>
+          <div class="devgame-shot">SCREENSHOT 2</div>
+          <div class="devgame-shot">SCREENSHOT 3</div>
+        </div>
+      </div>
+
+      <div class="devgame-info">
+        <p class="devgame-status">PROTOTYPE · 개발 진행중</p>
+        <h3 class="devgame-title">새 프로젝트<br><span class="devgame-title-note">(가제 · 제목 미정)</span></h3>
+        <p class="devgame-tagline">한 줄로 표현하는 게임 소개 문구를 여기에 작성하세요.</p>
+        <p class="devgame-desc">
+          게임에 대한 자세한 소개 문구를 이곳에 작성하세요. 어떤 장르인지,
+          어떤 재미를 주는지, 핵심 시스템은 무엇인지 자유롭게 설명하면 됩니다.
+          여러 문장을 이어서 작성해도 자동으로 줄바꿈됩니다.
+        </p>
+        <div class="tag-row">
+          <span class="tag">장르</span>
+          <span class="tag">플랫폼</span>
+          <span class="tag">개발 진행률 00%</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ▼ 하단 저작권 문구
+     이스터에그: 아래 "PREUS" 글자를 10번 클릭하면 ./games/games.html 로 이동합니다.
+     (겉보기엔 평범한 텍스트처럼 보이도록 일부러 강조 스타일을 넣지 않았어요) -->
+<footer>
+  © 2026 <span id="easterEggWord">PREUS</span> GAMES. All rights reserved.
+</footer>
+
+<script>
+  // 모바일 메뉴 열고 닫기
+  const navToggle = document.getElementById('navToggle');
+  const navList = document.getElementById('navList');
+  navToggle.addEventListener('click', () => {
+    navList.classList.toggle('open');
+  });
+  navList.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => navList.classList.remove('open'));
+  });
+
+  // 스크롤 위치에 따라 상단 메뉴 활성 표시 자동 변경
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+
+  sections.forEach(sec => observer.observe(sec));
+
+  /* ================================================================
+     이스터에그 : 하단 저작권 문구의 "PREUS" 글자를 10번 클릭하면
+     숨겨진 게임 목록 페이지(./games/games.html)로 이동합니다.
+
+     ▷ 클릭 횟수 변경 : 아래 EGG_CLICKS_NEEDED 숫자만 바꾸면 됩니다.
+     ▷ 이동 경로 변경 : window.location.href 안의 경로를 바꾸면 됩니다.
+     ================================================================ */
+  const easterEggWord = document.getElementById('easterEggWord');
+  const EGG_CLICKS_NEEDED = 10;
+  let eggClickCount = 0;
+
+  easterEggWord.addEventListener('click', () => {
+    eggClickCount++;
+    if (eggClickCount >= EGG_CLICKS_NEEDED) {
+      window.location.href = './games/games.html';
+    }
+  });
+</script>
+
+</body>
+</html>
